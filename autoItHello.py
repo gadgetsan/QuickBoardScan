@@ -1,7 +1,7 @@
 import autoit #pip install -U pyautoit
 import easygui #pip install -U easygui
 from tinydb import TinyDB, Query #pip install -U tonydb
-
+from datetime import datetime
 '''
 #AutoIt Hello World
 autoit.run("notepad.exe")
@@ -24,6 +24,7 @@ items.insert({'value': 'Scale'})
 
 db = TinyDB('db.json')
 items = db.table('items')
+data = db.table('data')
 
 def addItem():
     newItemName = easygui.enterbox("Ajouter une le nom de l'item à ajouter (assurez-vous qu'il est bien écrit)", "Ajout d'un item", "")
@@ -38,13 +39,20 @@ def addItem():
 def listItems():
     allItems = items.all()
     itemListToDisplay = []
-    print allItems
     for oneItem in allItems:
         itemListToDisplay.append(oneItem["name"])
     listChoice = easygui.choicebox("Liste des Items - Choisissez un item pour le supprimer", "Liste des Items", itemListToDisplay)
     if listChoice != "" :
         Item = Query()
         items.remove(Item.name == listChoice)
+
+def fetchItemsData():
+    allItems = items.all()
+    for singleItem in allItems:
+        #ici on entrera les touches pour faire la recherche de l'item et afficher son prix de vente
+        itemPrice = easygui.enterbox("Entrez le prix le plus bas pour la vente de '" + singleItem["name"] + "'", "Entrée du prix", "")
+        data.insert({'name': singleItem["name"], 'price': itemPrice, 'timestamp': str(datetime.now())})
+
 
 
 menuChoice=["1 - Ajouter un item à suivre", "2 - Afficher la liste des items à suivre", "3 - Effectuer le suivi des items"]
@@ -61,5 +69,6 @@ elif int(choiceNum) == 2:
     listItems()
 elif int(choiceNum) == 3:
     print "Suivi des items"
+    fetchItemsData()
 else:
     print "Aucun Choix"
