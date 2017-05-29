@@ -1,7 +1,10 @@
+from datetime import datetime
+import sys
+import time
+
 import autoit #pip install -U pyautoit
 import easygui #pip install -U easygui
-from tinydb import TinyDB, Query #pip install -U tonydb
-from datetime import datetime
+from tinydb import TinyDB, Query #pip install -U tinydb
 '''
 #AutoIt Hello World
 autoit.run("notepad.exe")
@@ -50,25 +53,47 @@ def fetchItemsData():
     allItems = items.all()
     for singleItem in allItems:
         #ici on entrera les touches pour faire la recherche de l'item et afficher son prix de vente
+        autoit.win_activate("FINAL FANTASY XIV")
+        autoit.send(singleItem["name"])
+        autoit.send("{ENTER}")
+        time.sleep(0.5)
+        autoit.send("{NUMPAD6}")
+        time.sleep(0.5)
+        autoit.send("{NUMPAD0}")
         itemPrice = easygui.enterbox("Entrez le prix le plus bas pour la vente de '" + singleItem["name"] + "'", "Entrée du prix", "")
+        if itemPrice == "":
+            sys.exit()
+        time.sleep(0.5)
+        autoit.send("{NUMPADDOT}")
+        time.sleep(0.5)
+        autoit.send("{NUMPADDOT}")
+        time.sleep(0.5)
+        autoit.send("^+{a}")
+        time.sleep(0.5)
+        
         data.insert({'name': singleItem["name"], 'price': itemPrice, 'timestamp': str(datetime.now())})
 
 
+while True :
+    menuChoice=["1 - Ajouter un item à suivre", 
+    "2 - Afficher la liste des items à suivre",
+    "3 - Effectuer le suivi des items",
+    "4 - Quitter"]
+    choice = easygui.choicebox("Que voulez-vous faire?", "Logiciel Awesome", menuChoice)
 
-menuChoice=["1 - Ajouter un item à suivre", "2 - Afficher la liste des items à suivre", "3 - Effectuer le suivi des items"]
-choice = easygui.choicebox("Que voulez-vous faire?", "Logiciel Awesome", menuChoice)
+    choiceNum = choice[:1]
+    print ("Choix: " + choice)
 
-choiceNum = choice[:1]
-print "Choix: " + choice
-
-if int(choiceNum) == 1:
-    print "Ajout d'un item"
-    addItem()
-elif int(choiceNum) == 2:
-    print "Liste des items"
-    listItems()
-elif int(choiceNum) == 3:
-    print "Suivi des items"
-    fetchItemsData()
-else:
-    print "Aucun Choix"
+    if int(choiceNum) == 1:
+        print ("Ajout d'un item")
+        addItem()
+    elif int(choiceNum) == 2:
+        print ("Liste des items")
+        listItems()
+    elif int(choiceNum) == 3:
+        print ("Suivi des items")
+        fetchItemsData()
+    elif int(choiceNum) == 4:
+        exit()
+    else:
+        print ("Aucun Choix")
