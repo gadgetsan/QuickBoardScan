@@ -3,6 +3,7 @@ import easygui #pip install -U easygui
 from tinydb import TinyDB, Query #pip install -U tonydb
 from datetime import datetime
 import xlwt
+import os
 '''
 #AutoIt Hello World
 autoit.run("notepad.exe")
@@ -52,7 +53,8 @@ def fetchItemsData():
     for singleItem in allItems:
         #ici on entrera les touches pour faire la recherche de l'item et afficher son prix de vente
         itemPrice = easygui.enterbox("Entrez le prix le plus bas pour la vente de '" + singleItem["name"] + "'", "Entrée du prix", "")
-        data.insert({'name': singleItem["name"], 'price': itemPrice, 'timestamp': str(datetime.now())})
+        print(itemPrice)
+        data.insert({'name': singleItem["name"], 'price': str(itemPrice), 'timestamp': str(datetime.now())})
 
 def dateReString(original):
         elementdateTime =  datetime.strptime(original, "%Y-%m-%d %H:%M:%S.%f")
@@ -65,53 +67,46 @@ def excelExport():
     #ws.write(2, 1, 1)
     #ws.write(2, 2, xlwt.Formula("A3+B3"))
     DatesQuery = Query()
-    datesResult = data.all()
+    allData = data.all()
     distinctDates = []
-    for oneData in datesResult:    
-        date = dateReString(oneData["timestamp"])
-        if date not in distinctDates
-            distinctDates.append(date)
-        
-    i=0
-    for oneDate in distinctDates:
-        i=i+1
+    i=1
+    ws.write(0, 0, "Nom")
+    ws.write(0, 1, "Date")
+    ws.write(0, 2, "Prix")
+    for oneData in allData:  
+        if oneData["price"] is not None and oneData["price"].isdigit():
+            ws.write(i, 2, int(oneData["price"]))
+            ws.write(i, 0, oneData["name"])
+            ws.write(i, 1, dateReString(oneData["timestamp"]))
+            i = i+1
 
-        '''
-        allItems = items.all()
-        for oneItem in allItems:
-            #titre des colonnes
-            ws.write(0, i+1, oneItem["name"])
-            
-            ItemQuery = Query()
-            dataResult = data.search(ItemQuery.name == oneItem["name"])
-            j=1
-            for oneData in dataResult:
-                #ws.write(j, 0, oneData["timestamp"])
-                ws.write(j, i+1, int(oneData["price"]))
-                j=j+1
-            '''
-    wb.save('example.xls')
+    filename = 'example.xls'
+    wb.save(filename)
+    os.system("start "+filename)
         
 
 
+quit = False
+while not quit:
+    menuChoice=["1 - Ajouter un item à suivre", "2 - Afficher la liste des items à suivre", "3 - Effectuer le suivi des items", "4 - Exporter vers Excel", "5 - Quitter"]
+    choice = easygui.choicebox("Que voulez-vous faire?", "Logiciel Awesome", menuChoice)
 
-menuChoice=["1 - Ajouter un item à suivre", "2 - Afficher la liste des items à suivre", "3 - Effectuer le suivi des items", "5 - Exporter vers Excel"]
-choice = easygui.choicebox("Que voulez-vous faire?", "Logiciel Awesome", menuChoice)
-
-choiceNum = choice[:1]
-print "Choix: " + choice
-
-if int(choiceNum) == 1:
-    print "Ajout d'un item"
-    addItem()
-elif int(choiceNum) == 2:
-    print "Liste des items"
-    listItems()
-elif int(choiceNum) == 3:
-    print "Suivi des items"
-    fetchItemsData()
-elif int(choiceNum) == 5:
-    print "Exportation Excel"
-    excelExport()
-else:
-    print "Aucun Choix"
+    choiceNum = choice[:1]
+    print("Choix: " + choice)
+    if int(choiceNum) == 1:
+        print("Ajout d'un item")
+        addItem()
+    elif int(choiceNum) == 2:
+        print("Liste des items")
+        listItems()
+    elif int(choiceNum) == 3:
+        print("Suivi des items")
+        fetchItemsData()
+    elif int(choiceNum) == 4:
+        print("Exportation Excel")
+        excelExport()
+    elif int(choiceNum) == 5:
+        print("Quitter")
+        quit = True
+    else:
+        print("Aucun Choix")
